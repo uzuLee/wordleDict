@@ -3,20 +3,50 @@ import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
 
 # =========================
+# 디자인 설정
+# =========================
+
+BG_COLOR      = "#181824"  # 전체 배경
+PANEL_COLOR   = "#2d3142"  # 입력 패널 배경
+ENTRY_BG      = "#f6f7fb"  # 입력창 배경
+EXAMPLE_TEXT  = "#a0a3b1"  # 예시 글자 색
+LABEL_TEXT    = "#f6f7fb"  # 입력창 왼쪽 라벨 글자 색
+BTN_COLOR     = "#4f5d75"  # 버튼 배경
+BTN_TEXT      = "#f6f7fb"  # 버튼 글자
+RESULT_BG     = "#22223b"  # 결과창 배경
+RESULT_TEXT   = "#f6f7fb"  # 결과창 글자
+LETTER_TAG    = "#9597ff"  # 알파벳 구분자 색상 (고급스러운 색상)
+LABEL_FONT    = ("맑은 고딕", 12, "bold")
+TITLE_FONT    = ("맑은 고딕", 20, "bold")
+RESULT_FONT   = ("맑은 고딕", 12)
+
+# =========================
 # 데이터 처리 함수
 # =========================
 
-def load_words(filename="words.txt"):
+def load_words(filename="words.txt", user_filename="user_words.txt"):
     """
-    단어 목록 파일을 읽어서 소문자로 변환한 리스트로 반환합니다.
-    파일이 없을 경우 안내 메시지를 출력하고 빈 리스트를 반환합니다.
+    기본 단어 파일과 사용자가 추가한 단어 파일을 모두 읽어서 리스트로 반환합니다.
+    '#'로 시작하는 줄(주석)은 무시합니다.
+    두 파일 모두 없으면 안내 메시지를 출력하고 빈 리스트를 반환합니다.
     """
+    words = []
+    # 기본 단어 파일
     try:
         with open(filename, "r") as f:
-            return [word.strip().lower() for word in f if word.strip()]
+            words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
     except FileNotFoundError:
-        messagebox.showerror("파일 오류", f"❌ 단어 파일 '{filename}'이 존재하지 않아요. 파일을 확인해주세요!")
-        return []
+        messagebox.showwarning("파일 경고", f"기본 단어 파일 '{filename}'이 존재하지 않습니다.")
+    # 사용자 추가 단어 파일
+    try:
+        with open(user_filename, "r") as f:
+            words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
+    except FileNotFoundError:
+        # 사용자 파일은 없어도 무방
+        pass
+    if not words:
+        messagebox.showerror("파일 오류", "단어 파일을 찾을 수 없습니다.")
+    return words
 
 def pattern_to_regex(pattern: str):
     """
@@ -81,12 +111,12 @@ def run_filter():
     """
     검색 버튼 클릭 시 실행되는 함수.
     입력값을 받아 단어를 필터링하고 결과를 출력합니다.
-    조건이 모두 비어있으면 알파벳 순으로 전체 단어 목록을 보여줍니다.
+    조건이 모두 비어있으면 알파벳별로 구분자를 넣어 전체 단어 목록을 보여줍니다.
     """
     fixed_pattern = entry_pattern.get().strip()
     loose_letters = entry_loose.get().strip()
     exclude_letters = entry_exclude.get().strip()
-    words = load_words("words.txt")
+    words = load_words("words.txt", "user_words.txt")
     if not words:
         status_label.config(text="단어 파일을 찾을 수 없습니다.")
         return
@@ -94,14 +124,22 @@ def run_filter():
     result_text.config(state='normal')
     result_text.delete(1.0, tk.END)
 
-    # 조건이 모두 비어있을 때: 전체 단어 알파벳 순으로 출력
+    # 조건이 모두 비어있을 때: 전체 단어 알파벳별로 구분하여 출력
     if not fixed_pattern and not loose_letters and not exclude_letters:
         sorted_words = sorted(words)
-        result_text.insert(tk.END, f"조건이 입력되지 않았으므로 모든 단어를 알파벳 순으로 보여드립니다.\n")
+        result_text.insert(tk.END, f"조건이 입력되지 않았으므로 모든 단어를 알파벳별로 보여드립니다.\n")
         result_text.insert(tk.END, f"총 단어 수: {len(sorted_words)}\n\n")
+        current_letter = ""
         for word in sorted_words:
-            result_text.insert(tk.END, f"• {word}\n")
-        status_label.config(text="전체 단어 목록을 알파벳 순으로 표시합니다.")
+            first = word[0].upper()
+            if first != current_letter:
+                current_letter = first
+                # 알파벳 구분자에 태그 적용
+                result_text.insert(tk.END, f"\n[{current_letter}]\n", "letter_tag")
+            result_text.insert(tk.END, f"{word}\n")
+        # 구분자 태그 스타일(디자인 설정에서 색상 적용)
+        result_text.tag_config("letter_tag", foreground=LETTER_TAG, font=("맑은 고딕", 13, "bold"))
+        status_label.config(text="전체 단어 목록을 알파벳별로 표시합니다.")
         result_text.config(state='disabled')
         return
 
@@ -116,7 +154,7 @@ def run_filter():
         status_label.config(text="검색이 완료되었습니다.")
     else:
         result_text.insert(tk.END, "😥 조건에 맞는 단어가 없습니다.\n")
-        result_text.insert(tk.END, "오늘의 워들 정답을 알게 되면 단어 목록에 추가해 주세요!\n")
+        result_text.insert(tk.END, "오늘의 워들 정답을 알게 되면 user_words.txt 파일에 추가해 주세요!\n")
         result_text.insert(tk.END, "다음에 같은 단어가 나왔을 때 더 쉽게 찾을 수 있어요. 😉")
         status_label.config(text="조건에 맞는 단어가 없습니다.")
     result_text.config(state='disabled')
@@ -144,23 +182,6 @@ def create_labeled_entry(master, label_text, example_text, row):
     return entry
 
 # =========================
-# 디자인 설정
-# =========================
-
-BG_COLOR      = "#181824"  # 전체 배경
-PANEL_COLOR   = "#2d3142"  # 입력 패널 배경
-ENTRY_BG      = "#f6f7fb"  # 입력창 배경
-EXAMPLE_TEXT  = "#a0a3b1"  # 예시 글자 색
-LABEL_TEXT    = "#f6f7fb"  # 입력창 왼쪽 라벨 글자 색
-BTN_COLOR     = "#4f5d75"  # 버튼 배경
-BTN_TEXT      = "#f6f7fb"  # 버튼 글자
-RESULT_BG     = "#22223b"  # 결과창 배경
-RESULT_TEXT   = "#f6f7fb"  # 결과창 글자
-LABEL_FONT    = ("맑은 고딕", 12, "bold")
-TITLE_FONT    = ("맑은 고딕", 20, "bold")
-RESULT_FONT   = ("맑은 고딕", 12)
-
-# =========================
 # 메인 윈도우 구성
 # =========================
 
@@ -171,8 +192,8 @@ root.configure(bg=BG_COLOR)
 root.resizable(False, False)
 
 # 타이틀 및 안내
-tk.Label(root, text="🎯 워들 단어 필터기", font=TITLE_FONT, bg=BG_COLOR, fg="#f6f7fb").pack(pady=(28, 5))
-tk.Label(root, text="아래 조건을 입력하고 원하는 단어를 찾아보세요!", font=("맑은 고딕", 13), bg=BG_COLOR, fg="#a0a3b1").pack()
+tk.Label(root, text="🎯 워들 단어 필터기", font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
+tk.Label(root, text="아래 조건을 입력하고 원하는 단어를 찾아보세요!", font=("맑은 고딕", 13), bg=BG_COLOR, fg=EXAMPLE_TEXT).pack()
 
 # 입력 패널
 frame = tk.Frame(root, bg=PANEL_COLOR, bd=0, relief="flat")
@@ -188,7 +209,7 @@ entry_exclude = create_labeled_entry(frame, "[3] 제외할 글자들", "예시: 
 btn_frame = tk.Frame(root, bg=BG_COLOR)
 btn_frame.pack(pady=16)
 search_btn = tk.Button(btn_frame, text="🔍 검색하기", command=run_filter, font=("맑은 고딕", 14, "bold"),
-          bg=BTN_COLOR, fg=BTN_TEXT, activebackground="#22223b", activeforeground=BTN_TEXT,
+          bg=BTN_COLOR, fg=BTN_TEXT, activebackground=RESULT_BG, activeforeground=BTN_TEXT,
           relief="flat", bd=0, cursor="hand2", padx=24, pady=8)
 search_btn.pack()
 
@@ -206,7 +227,7 @@ status_frame = tk.Frame(root, bg=BG_COLOR)
 status_frame.pack(side="bottom", fill="x")
 
 status_label = tk.Label(status_frame, text="워들 단어 필터기입니다. 단어 검색을 시작해보세요!", font=("맑은 고딕", 10),
-                        bg=BG_COLOR, fg="#a0a3b1")
+                        bg=BG_COLOR, fg=EXAMPLE_TEXT)
 status_label.pack(pady=8)
 
 # =========================
