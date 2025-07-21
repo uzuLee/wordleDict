@@ -186,13 +186,13 @@ def create_labeled_entry(master, label_text, example_text, row):
 # =========================
 
 root = tk.Tk()
-root.title("워들 단어 필터기")
+root.title("워들 단어 사전")
 root.geometry("560x740")
 root.configure(bg=BG_COLOR)
 root.resizable(False, False)
 
 # 타이틀 및 안내
-tk.Label(root, text="🎯 워들 단어 필터기", font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
+tk.Label(root, text="🎯 워들 단어 사전", font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
 tk.Label(root, text="아래 조건을 입력하고 원하는 단어를 찾아보세요!", font=("맑은 고딕", 13), bg=BG_COLOR, fg=EXAMPLE_TEXT).pack()
 
 # 입력 패널
