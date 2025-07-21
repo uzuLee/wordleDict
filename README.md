@@ -1,0 +1,2 @@
+# wordleDict
+Helper for wordle
