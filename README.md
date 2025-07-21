@@ -21,9 +21,9 @@ Users can input a fixed letter pattern, letters that must be included but not in
 4. **조건 입력 (Input conditions):**  
    - **확정된 글자 패턴 (Fixed letter pattern):**  
      예시: `_ a _ b _`  
-     언더바(_)는 아직 모르는 글자, 알파벳은 확정된 글자입니다.  
+     언더바(\_)는 아직 모르는 글자, 알파벳은 확정된 글자입니다.  
      Example: `_ a _ b _`  
-     Underscore(_) means unknown letter, alphabet means fixed letter.
+     Underscore(\_) means unknown letter, alphabet means fixed letter.
    - **유동 글자 입력 (Loose letter input):**  
      예시: `a(1,4) b(3,4)`  
      a는 1,4번째에 오면 안 되고, b는 3,4번째에 오면 안 됩니다.  
