@@ -58,7 +58,7 @@ Users can input a fixed letter pattern, letters that must be included but not in
   Main code for Wordle Word Dict
 - [`words.txt`](words.txt): [단어 목록 파일(By cfreshman)](https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b#file-wordle-answers-alphabetical-txt)  
   [Word list file(By cfreshman)](https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b#file-wordle-answers-alphabetical-txt)
-  - [`icon.ico`](icon.ico): [아이콘(By wikimedia commons)](https://commons.wikimedia.org/wiki/File:Book_with_Lens_Flat_Icon_Vector.svg)  
+- [`icon.ico`](icon.ico): [아이콘(By wikimedia commons)](https://commons.wikimedia.org/wiki/File:Book_with_Lens_Flat_Icon_Vector.svg)  
   [Icon(By wikimedia commons)](https://commons.wikimedia.org/wiki/File:Book_with_Lens_Flat_Icon_Vector.svg)
 
 ## 라이선스 (License)
