@@ -24,14 +24,22 @@ Users can input a fixed letter pattern, letters that must be included but not in
 ## 사용 방법 (How to Use)
 
 1. **단어 목록 준비 (Prepare word list):**  
-   [`wordleDict.exe`](wordleDict.exe)와 같은 폴더에 [`words.txt`](words.txt)와 [`user_words.txt`](user_words.txt) 파일을 준비하세요. 각 줄마다 하나의 단어를 입력합니다.  
-   Prepare [`words.txt`](words.txt) and [`user_words.txt`](user_words.txt) files in the same folder as [`wordleDict.exe`](wordleDict.exe). Enter one word per line.
+   [`wordleDict.exe`](wordleDict.exe)와 같은 폴더에 [`words.txt`](words.txt)와 [`extended_words.txt`](extended_words.txt), [`user_words.txt`](user_words.txt) 파일을 준비하세요. 각 줄마다 하나의 단어를 입력합니다.  
+   Prepare [`words.txt`](words.txt) and [`extended_words.txt`](extended_words.txt), [`user_words.txt`](user_words.txt) files in the same folder as [`wordleDict.exe`](wordleDict.exe). Enter one word per line.
 
 2. **프로그램 실행 (Run the program):**  
    [`wordleDict.exe`](wordleDict.exe)를 실행하세요.  
    Run [`wordleDict.exe`](wordleDict.exe).
 
 3. **조건 입력 (Input conditions):**  
+   - **단어 목록 확장 여부 점검 (Check for word list expansion):**
+
+      단어 목록을 확장할 경우, 매우 많은 단어들을 등록하여 검색합니다.  
+      When the word list is expanded, a vast number of words are registered for search.  
+
+      검색한 단어가 목록에 없을 가능성이 낮아지지만, 목록에 있는 단어가 워들에 등록되지 않은 단어일 가능성이 높아집니다.  
+      While the chances of a searched word not being in the list decrease, the likelihood that words in the list are not registered in Wordle increases.
+
    - **확정된 글자 패턴 (Fixed letter pattern):**  
      예시: `_ a _ b _`  
      언더바(\_)는 아직 모르는 글자, 알파벳은 확정된 글자입니다.  
@@ -48,7 +56,7 @@ Users can input a fixed letter pattern, letters that must be included but not in
      Example: `a,d,e,i,s,y`  
      Words containing these letters will be excluded.
 
-4. **결과 확인 (Check results):**  
+1. **결과 확인 (Check results):**  
    조건에 맞는 단어 목록과 개수를 출력합니다.  
    The program will print the list and count of words that match the conditions.  
    조건을 입력하지 않으면 모든 단어를 알파벳 순으로 보여줍니다.  
@@ -56,8 +64,8 @@ Users can input a fixed letter pattern, letters that must be included but not in
 
 ## 주요 함수 (Main Functions)
 
-- [`load_words`](wordleDict.py): `words.txt`와 `user_words.txt`에서 단어 목록을 읽어옵니다.  
-  Reads the word list from `words.txt` and `user_words.txt`.
+- [`load_words`](wordleDict.py): `words.txt`와 `extended_words.txt`, `user_words.txt`에서 단어 목록을 읽어옵니다.  
+  Reads the word list from `words.txt` and `extendedwords.txt`, `user_words.txt`.
 - [`pattern_to_regex`](wordleDict.py): 워들 스타일 패턴을 정규식으로 변환합니다.  
   Converts Wordle-style patterns to regular expressions.
 - [`parse_loose_letters`](wordleDict.py): 유동 글자와 위치 정보를 파싱합니다.  
@@ -71,12 +79,14 @@ Users can input a fixed letter pattern, letters that must be included but not in
   Wordle Word Dict executable file
 - [`wordleDict.py`](wordleDict.py): 워들 단어 사전 메인 코드  
   Main code for Wordle Word Dict
-- [`words.txt`](words.txt): 기본 단어 목록 파일  
-  Default word list file
+- [`words.txt`](words.txt): [기본 단어 목록 파일(By cfreshman)](https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b#file-wordle-answers-alphabetical-txt)  
+  [Default word list file(By cfreshman)](https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b#file-wordle-answers-alphabetical-txt)
+- [`extended_words.txt`](extended_words.txt): [단어 목록 확장 파일(By dwyl)](https://github.com/dwyl/english-words/blob/master/words_alpha.txt)  
+  [Extended word list file(By dwyl)](https://github.com/dwyl/english-words/blob/master/words_alpha.txt)
 - [`user_words.txt`](user_words.txt): 사용자 추가 단어 목록 파일  
   User-added word list file
-- [`icon.ico`](icon.ico): 아이콘 파일  
-  Icon file
+- [`icon.ico`](icon.ico): [아이콘 파일(By wikimedia commons)](https://commons.wikimedia.org/wiki/File:Book_with_Lens_Flat_Icon_Vector.svg)  
+  [Icon file(By wikimedia commons)](https://commons.wikimedia.org/wiki/File:Book_with_Lens_Flat_Icon_Vector.svg)
 
 ## 라이선스 (License)
 
