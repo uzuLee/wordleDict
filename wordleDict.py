@@ -70,7 +70,7 @@ def pattern_to_regex(pattern: str):
     cleaned = pattern.replace(" ", "").lower()
     return "^" + "".join("." if ch == "_" else ch for ch in cleaned) + "$"
 
-def parse_loose_letters(input_str):전", font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
+def parse_loose_letters(input_str):(font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
 tk.Label(root, text="아래 조건을 입력하고 원하는 단어를 찾아보세요!", font=("맑은 고딕", 13), bg=BG_COLOR, fg=EXAMPLE_TEXT).pack()
 
 # 입력 패널
