@@ -1,6 +1,7 @@
 import re
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
+from tkinter import BooleanVar
 
 # =========================
 # 디자인 설정
@@ -24,9 +25,11 @@ RESULT_FONT   = ("맑은 고딕", 12)
 # 데이터 처리 함수
 # =========================
 
-def load_words(filename="words.txt", user_filename="user_words.txt"):
+USE_EXTENDED_WORDS = False  # 확장 단어팩 사용 여부 설정
+
+def load_words(filename="words.txt", user_filename="user_words.txt", extended_filename="extended_words.txt"):
     """
-    기본 단어 파일과 사용자가 추가한 단어 파일을 모두 읽어서 리스트로 반환합니다.
+    기본 단어 파일, 확장 단어 파일, 사용자가 추가한 단어 파일을 모두 읽어서 리스트로 반환합니다.
     '#'로 시작하는 줄(주석)은 무시합니다.
     두 파일 모두 없으면 안내 메시지를 출력하고 빈 리스트를 반환합니다.
     """
@@ -37,13 +40,22 @@ def load_words(filename="words.txt", user_filename="user_words.txt"):
             words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
     except FileNotFoundError:
         messagebox.showwarning("파일 경고", f"기본 단어 파일 '{filename}'이 존재하지 않습니다.")
+    
+    # 확장 단어 파일 (USE_EXTENDED_WORDS가 True일 때만 사용)
+    if USE_EXTENDED_WORDS:
+        try:
+            with open(extended_filename, "r") as f:
+                words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
+        except FileNotFoundError:
+            messagebox.showwarning("파일 경고", f"확장 단어 파일 '{extended_filename}'이 존재하지 않습니다.")
+    
     # 사용자 추가 단어 파일
     try:
         with open(user_filename, "r") as f:
             words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
     except FileNotFoundError:
-        # 사용자 파일은 없어도 무방
         pass
+
     if not words:
         messagebox.showerror("파일 오류", "단어 파일을 찾을 수 없습니다.")
     return words
@@ -107,6 +119,19 @@ def filter_words(words, fixed_pattern, loose_letters, exclude_letters):
 # UI 및 이벤트 함수
 # =========================
 
+def toggle_extended_words():
+    """
+    확장 단어팩 사용 여부를 토글합니다.
+    """
+    global USE_EXTENDED_WORDS
+    USE_EXTENDED_WORDS = not USE_EXTENDED_WORDS
+    status_label.config(text=f"확장 단어팩 사용: {'활성화' if USE_EXTENDED_WORDS else '비활성화'}")
+
+def on_extended_switch():
+    global USE_EXTENDED_WORDS
+    USE_EXTENDED_WORDS = USE_EXTENDED_WORDS_VAR.get()
+    status_label.config(text=f"확장 단어팩 사용: {'활성화' if USE_EXTENDED_WORDS else '비활성화'}")
+
 def run_filter():
     """
     검색 버튼 클릭 시 실행되는 함수.
@@ -116,7 +141,7 @@ def run_filter():
     fixed_pattern = entry_pattern.get().strip()
     loose_letters = entry_loose.get().strip()
     exclude_letters = entry_exclude.get().strip()
-    words = load_words("words.txt", "user_words.txt")
+    words = load_words("words.txt", "user_words.txt", "extended_words.txt")
     if not words:
         status_label.config(text="단어 파일을 찾을 수 없습니다.")
         return
@@ -186,13 +211,13 @@ def create_labeled_entry(master, label_text, example_text, row):
 # =========================
 
 root = tk.Tk()
-root.title("워들 단어 사전")
+root.title("워들 단어 필터기")
 root.geometry("560x740")
 root.configure(bg=BG_COLOR)
 root.resizable(False, False)
 
 # 타이틀 및 안내
-tk.Label(root, text="🎯 워들 단어 사전", font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
+tk.Label(root, text="🎯 워들 단어 필터기", font=TITLE_FONT, bg=BG_COLOR, fg=LABEL_TEXT).pack(pady=(28, 5))
 tk.Label(root, text="아래 조건을 입력하고 원하는 단어를 찾아보세요!", font=("맑은 고딕", 13), bg=BG_COLOR, fg=EXAMPLE_TEXT).pack()
 
 # 입력 패널
@@ -208,10 +233,30 @@ entry_exclude = create_labeled_entry(frame, "[3] 제외할 글자들", "예시: 
 # 검색 버튼
 btn_frame = tk.Frame(root, bg=BG_COLOR)
 btn_frame.pack(pady=16)
+
 search_btn = tk.Button(btn_frame, text="🔍 검색하기", command=run_filter, font=("맑은 고딕", 14, "bold"),
           bg=BTN_COLOR, fg=BTN_TEXT, activebackground=RESULT_BG, activeforeground=BTN_TEXT,
           relief="flat", bd=0, cursor="hand2", padx=24, pady=8)
-search_btn.pack()
+search_btn.pack(side="left", padx=(0, 12))
+
+# 확장 단어팩 토글 스위치
+USE_EXTENDED_WORDS_VAR = BooleanVar(value=USE_EXTENDED_WORDS)
+
+toggle_switch = ttk.Checkbutton(
+    btn_frame,
+    text="확장 단어팩 사용",
+    variable=USE_EXTENDED_WORDS_VAR,
+    command=on_extended_switch,
+    style="Switch.TCheckbutton"
+)
+toggle_switch.pack(side="left")
+
+# 스위치 스타일(파란색 강조)
+style = ttk.Style()
+style.configure("Switch.TCheckbutton",
+                font=("맑은 고딕", 12),
+                foreground=BTN_TEXT,
+                background=BG_COLOR)
 
 # 결과 출력 영역
 result_frame = tk.Frame(root, bg=RESULT_BG, bd=2, relief="groove")
