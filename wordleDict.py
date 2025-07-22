@@ -34,12 +34,6 @@ def load_words(filename="words.txt", user_filename="user_words.txt", extended_fi
     두 파일 모두 없으면 안내 메시지를 출력하고 빈 리스트를 반환합니다.
     """
     words = []
-    # 기본 단어 파일
-    try:
-        with open(filename, "r") as f:
-            words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
-    except FileNotFoundError:
-        messagebox.showwarning("파일 경고", f"기본 단어 파일 '{filename}'이 존재하지 않습니다.")
     
     # 확장 단어 파일 (USE_EXTENDED_WORDS가 True일 때만 사용)
     if USE_EXTENDED_WORDS:
@@ -48,6 +42,14 @@ def load_words(filename="words.txt", user_filename="user_words.txt", extended_fi
                 words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
         except FileNotFoundError:
             messagebox.showwarning("파일 경고", f"확장 단어 파일 '{extended_filename}'이 존재하지 않습니다.")
+    
+    else:
+                # 기본 단어 파일
+        try:
+            with open(filename, "r") as f:
+                words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
+        except FileNotFoundError:
+            messagebox.showwarning("파일 경고", f"기본 단어 파일 '{filename}'이 존재하지 않습니다.")
     
     # 사용자 추가 단어 파일
     try:
