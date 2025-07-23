@@ -213,7 +213,7 @@ def create_labeled_entry(master, label_text, example_text, row):
 # =========================
 
 root = tk.Tk()
-root.title("워들 단어 필터기")
+root.title("워들 단어 사전")
 root.geometry("560x740")
 root.configure(bg=BG_COLOR)
 root.resizable(False, False)
@@ -273,7 +273,7 @@ result_text.config(state='disabled')
 status_frame = tk.Frame(root, bg=BG_COLOR)
 status_frame.pack(side="bottom", fill="x")
 
-status_label = tk.Label(status_frame, text="워들 단어 필터기입니다. 단어 검색을 시작해보세요!", font=("맑은 고딕", 10),
+status_label = tk.Label(status_frame, text="워들 단어 사전입니다. 단어 검색을 시작해보세요!", font=("맑은 고딕", 10),
                         bg=BG_COLOR, fg=EXAMPLE_TEXT)
 status_label.pack(pady=8)
 
