@@ -65,7 +65,7 @@ Users can input a fixed letter pattern, letters that must be included but not in
 ## 주요 함수 (Main Functions)
 
 - [`load_words`](wordleDict.py): `words.txt`와 `extended_words.txt`, `user_words.txt`에서 단어 목록을 읽어옵니다.  
-  Reads the word list from `words.txt` and `extendedwords.txt`, `user_words.txt`.
+  Reads the word list from `words.txt` and `extended_words.txt`, `user_words.txt`.
 - [`pattern_to_regex`](wordleDict.py): 워들 스타일 패턴을 정규식으로 변환합니다.  
   Converts Wordle-style patterns to regular expressions.
 - [`parse_loose_letters`](wordleDict.py): 유동 글자와 위치 정보를 파싱합니다.  
