@@ -7,54 +7,75 @@ from tkinter import BooleanVar
 # 디자인 설정
 # =========================
 
-BG_COLOR      = "#181824"
-PANEL_COLOR   = "#2d3142"
-ENTRY_BG      = "#f6f7fb"
-EXAMPLE_TEXT  = "#a0a3b1"
-LABEL_TEXT    = "#f6f7fb"
-BTN_COLOR     = "#4f5d75"
-BTN_TEXT      = "#f6f7fb"
-RESULT_BG     = "#22223b"
-RESULT_TEXT   = "#f6f7fb"
-LETTER_TAG    = "#9597ff"
-LABEL_FONT    = ("맑은 고딕", 12, "bold")
-TITLE_FONT    = ("맑은 고딕", 20, "bold")
-RESULT_FONT   = ("맑은 고딕", 12)
+BG_COLOR      = "#181824"  # 전체 배경 색상
+PANEL_COLOR   = "#2d3142"  # 입력 패널 배경 색상
+ENTRY_BG      = "#f6f7fb"  # 입력창 배경 색상
+EXAMPLE_TEXT  = "#a0a3b1"  # 예시 텍스트 색상
+LABEL_TEXT    = "#f6f7fb"  # 라벨 텍스트 색상
+BTN_COLOR     = "#4f5d75"  # 버튼 배경 색상
+BTN_TEXT      = "#f6f7fb"  # 버튼 텍스트 색상
+RESULT_BG     = "#22223b"  # 결과창 배경 색상
+RESULT_TEXT   = "#f6f7fb"  # 결과창 텍스트 색상
+LETTER_TAG    = "#9597ff"  # 알파벳 구분자 색상
+TOGGLE_ON_COLOR = "#4f8cff"  # 토글 스위치 활성화 색상
+TOGGLE_OFF_COLOR = BTN_COLOR  # 토글 스위치 비활성화 색상
+LABEL_FONT    = ("맑은 고딕", 12, "bold")  # 라벨 폰트
+TITLE_FONT    = ("맑은 고딕", 20, "bold")  # 타이틀 폰트
+RESULT_FONT   = ("맑은 고딕", 12)          # 결과창 폰트
 
 # =========================
 # 데이터 처리 함수
 # =========================
 
-USE_EXTENDED_WORDS = False
+USE_EXTENDED_WORDS = False  # 확장 단어팩 사용 여부 설정
 
 def load_words(filename="words.txt", user_filename="user_words.txt", extended_filename="extended_words.txt"):
+    """
+    단어 파일을 읽어서 리스트로 반환합니다.
+    - 기본 단어 파일, 확장 단어 파일, 사용자 추가 단어 파일을 모두 읽습니다.
+    - '#'로 시작하는 줄은 주석으로 간주하여 무시합니다.
+    - 모든 파일은 UTF-8로 인코딩하여 읽습니다.
+    """
     words = []
+    # 확장 단어 파일 (USE_EXTENDED_WORDS가 True일 때만 사용)
     if USE_EXTENDED_WORDS:
         try:
-            with open(extended_filename, "r") as f:
+            with open(extended_filename, "r", encoding="utf-8") as f:
                 words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
         except FileNotFoundError:
             messagebox.showwarning("파일 경고", f"확장 단어 파일 '{extended_filename}'이 존재하지 않습니다.")
     else:
+        # 기본 단어 파일
         try:
-            with open(filename, "r") as f:
+            with open(filename, "r", encoding="utf-8") as f:
                 words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
         except FileNotFoundError:
             messagebox.showwarning("파일 경고", f"기본 단어 파일 '{filename}'이 존재하지 않습니다.")
+    # 사용자 추가 단어 파일
     try:
-        with open(user_filename, "r") as f:
+        with open(user_filename, "r", encoding="utf-8") as f:
             words += [word.strip().lower() for word in f if word.strip() and not word.strip().startswith("#")]
     except FileNotFoundError:
         pass
+    # 단어가 없으면 오류 메시지 출력
     if not words:
         messagebox.showerror("파일 오류", "단어 파일을 찾을 수 없습니다.")
     return words
 
 def pattern_to_regex(pattern: str):
+    """
+    워들 스타일 패턴(예: _ a _ b _)을 정규식으로 변환합니다.
+    - '_'는 임의의 한 글자를 의미하며, 나머지 글자는 그대로 사용됩니다.
+    """
     cleaned = pattern.replace(" ", "").lower()
     return "^" + "".join("." if ch == "_" else ch for ch in cleaned) + "$"
 
 def parse_loose_letters(input_str):
+    """
+    유동 글자와 해당 글자가 오면 안 되는 위치를 파싱합니다.
+    - 예시 입력: a(1,4) b(3,4)
+    - 결과: {'a': [0, 3], 'b': [2, 3]}  # 인덱스는 0부터 시작
+    """
     if not input_str.strip():
         return {}
     pattern = r"([a-zA-Z])\(([\d,]+)\)"
@@ -66,6 +87,12 @@ def parse_loose_letters(input_str):
     return result
 
 def filter_words(words, fixed_pattern, loose_letters, exclude_letters):
+    """
+    단어 리스트에서 아래 조건을 모두 만족하는 단어만 필터링합니다.
+    1. fixed_pattern에 맞는 단어
+    2. exclude_letters에 포함된 글자가 없는 단어
+    3. loose_letters에 명시된 글자가 반드시 포함되어 있고, 지정된 위치에는 없어야 함
+    """
     regex = re.compile(pattern_to_regex(fixed_pattern))
     exclude_set = set(exclude_letters.lower().replace(",", ""))
     loose_map = parse_loose_letters(loose_letters)
@@ -95,16 +122,27 @@ def filter_words(words, fixed_pattern, loose_letters, exclude_letters):
 # =========================
 
 def toggle_extended_words():
+    """
+    확장 단어팩 사용 여부를 토글합니다.
+    """
     global USE_EXTENDED_WORDS
     USE_EXTENDED_WORDS = not USE_EXTENDED_WORDS
     status_label.config(text=f"확장 단어팩 사용: {'활성화' if USE_EXTENDED_WORDS else '비활성화'}")
 
 def on_extended_switch():
+    """
+    확장 단어팩 사용 여부를 스위치 상태에 따라 설정합니다.
+    """
     global USE_EXTENDED_WORDS
     USE_EXTENDED_WORDS = USE_EXTENDED_WORDS_VAR.get()
     status_label.config(text=f"확장 단어팩 사용: {'활성화' if USE_EXTENDED_WORDS else '비활성화'}")
 
 def run_filter():
+    """
+    검색 버튼 클릭 시 실행되는 함수.
+    입력값을 받아 단어를 필터링하고 결과를 출력합니다.
+    조건이 모두 비어있으면 알파벳별로 구분자를 넣어 전체 단어 목록을 보여줍니다.
+    """
     fixed_pattern = entry_pattern.get().strip()
     loose_letters = entry_loose.get().strip()
     exclude_letters = entry_exclude.get().strip()
@@ -148,6 +186,9 @@ def run_filter():
     result_text.config(state='disabled')
 
 def create_labeled_entry(master, label_text, example_text, row):
+    """
+    라벨과 예시, 입력창을 한 줄에 배치하는 고급 입력창 생성 함수
+    """
     label = tk.Label(master, text=label_text, font=LABEL_FONT, bg=PANEL_COLOR, fg=LABEL_TEXT, anchor="w")
     label.grid(row=row, column=0, sticky="w", padx=(18,8), pady=10)
     entry_style = ttk.Style()
@@ -197,20 +238,34 @@ search_btn.pack(side="left", padx=(0, 12))
 
 USE_EXTENDED_WORDS_VAR = BooleanVar(value=USE_EXTENDED_WORDS)
 
-toggle_switch = ttk.Checkbutton(
-    btn_frame,
-    text="확장 단어팩 사용",
-    variable=USE_EXTENDED_WORDS_VAR,
-    command=on_extended_switch,
-    style="Switch.TCheckbutton"
-)
-toggle_switch.pack(side="left")
+def toggle_switch_action():
+    """
+    토글 스위치 클릭 시 상태를 변경하고 UI를 업데이트합니다.
+    """
+    USE_EXTENDED_WORDS_VAR.set(not USE_EXTENDED_WORDS_VAR.get())
+    on_extended_switch()
+    # 버튼 색상 변경
+    if USE_EXTENDED_WORDS_VAR.get():
+        toggle_btn.config(bg=TOGGLE_ON_COLOR, fg="#fff", text="확장 단어팩: ON")
+    else:
+        toggle_btn.config(bg=TOGGLE_OFF_COLOR, fg=BTN_TEXT, text="확장 단어팩: OFF")
 
-style = ttk.Style()
-style.configure("Switch.TCheckbutton",
-                font=("맑은 고딕", 12),
-                foreground=BTN_TEXT,
-                background=BG_COLOR)
+toggle_btn = tk.Button(
+    btn_frame,
+    text="확장 단어팩: OFF",
+    font=("맑은 고딕", 12, "bold"),
+    bg=TOGGLE_OFF_COLOR,
+    fg=BTN_TEXT,
+    activebackground=TOGGLE_ON_COLOR,
+    activeforeground="#fff",
+    relief="flat",
+    bd=0,
+    cursor="hand2",
+    padx=18,
+    pady=7,
+    command=toggle_switch_action
+)
+toggle_btn.pack(side="left")
 
 result_frame = tk.Frame(root, bg=RESULT_BG, bd=2, relief="groove")
 result_frame.pack(padx=18, pady=(0, 18), fill="both", expand=True)
@@ -227,7 +282,6 @@ status_label = tk.Label(status_frame, text="워들 단어 사전입니다. 단�
                         bg=BG_COLOR, fg=EXAMPLE_TEXT)
 status_label.pack(pady=8)
 
-# ✅ 대안 3 적용: Enter 키로도 검색 실행
 root.bind("<Return>", lambda event: run_filter())
 
 # 프로그램 실행
